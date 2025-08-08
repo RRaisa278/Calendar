@@ -1,10 +1,12 @@
 import java.awt.BorderLayout;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Calendar;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -13,122 +15,158 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class CalendarStep1 extends JFrame {
-	private JButton prevButton, nextButton;
-    private JComboBox<String> monthCombo;
-    private JComboBox<Integer> yearCombo;
-    private JLabel monthYearLabel;
-    private JPanel datePanel;
+	 private JButton prevButton, nextButton;
+	    private JComboBox<String> monthCombo;
+	    private JComboBox<Integer> yearCombo;
+	    private JLabel monthYearLabel;
+	    private JPanel datePanel;
 
-    public CalendarStep1() {
-        setTitle("My Calendar Project - Step 3");
-        setSize(550,450);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);         
-        setLocationRelativeTo(null);
+	    public CalendarStep1() {
+	        setTitle("My Calendar Project - Step 3");   
+	        setSize(550, 450);
+	        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
+	        setLocationRelativeTo(null);
 
-        
-        ImageIcon originalIcon = new ImageIcon("img/pic23.jpg");
-        Image scaledImage = originalIcon.getImage().getScaledInstance(550, 455, Image.SCALE_SMOOTH);
-        ImageIcon resizedIcon = new ImageIcon(scaledImage);
+	        ImageIcon originalIcon = new ImageIcon("img/pic23.jpg");
+	        Image scaledImage = originalIcon.getImage().getScaledInstance(550, 455, Image.SCALE_SMOOTH);
+	        ImageIcon resizedIcon = new ImageIcon(scaledImage);
 
-        JLabel background = new JLabel(resizedIcon);
-        background.setLayout(new BorderLayout());
-        setContentPane(background);
+	        JLabel background = new JLabel(resizedIcon);
+	        background.setLayout(new BorderLayout());
+	        setContentPane(background);
 
-        setLayout(new BorderLayout());
+	        setLayout(new BorderLayout());
 
-        
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
+	        JPanel topPanel = new JPanel(new BorderLayout()); 
+	        topPanel.setOpaque(false);
 
-        
-        JPanel navPanel = new JPanel();
-        navPanel.setOpaque(false);
-        prevButton = new JButton("←");
-        nextButton = new JButton("→");
+	        JPanel navPanel = new JPanel();
+	        navPanel.setOpaque(false);
+	        prevButton = new JButton("←");
+	        nextButton = new JButton("→");
 
-        String[] months = {"January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"};
-        monthCombo = new JComboBox<>(months);
+	        String[] months = {"January", "February", "March", "April", "May", "June",
+	                           "July", "August", "September", "October", "November", "December"};
+	        monthCombo = new JComboBox<>(months);
 
-        yearCombo = new JComboBox<>();
-        for (int year = 1990; year <= 2100; year++) {
-            yearCombo.addItem(year);
-        }
+	        yearCombo = new JComboBox<>();
+	        for (int year = 1990; year <= 2100; year++) {
+	            yearCombo.addItem(year);
+	        }
 
-        navPanel.add(prevButton);
-        navPanel.add(monthCombo);
-        navPanel.add(yearCombo);
-        navPanel.add(nextButton);
+	        navPanel.add(prevButton);
+	        navPanel.add(monthCombo);
+	        navPanel.add(yearCombo);
+	        navPanel.add(nextButton);
 
-        
-        monthYearLabel = new JLabel("Month Year", JLabel.CENTER);
-        monthYearLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        monthYearLabel.setForeground(Color.BLACK);
+	        monthYearLabel = new JLabel("Month Year", JLabel.CENTER);
+	        monthYearLabel.setFont(new Font("Arial", Font.BOLD, 20));
+	        monthYearLabel.setForeground(Color.BLACK);
 
-        
-        JPanel weekdayPanel = new JPanel(new GridLayout(1, 7));
-        weekdayPanel.setOpaque(false);
-        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (String day : days) {
-            JLabel dayLabel = new JLabel(day, JLabel.CENTER);
-            dayLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-            dayLabel.setForeground(Color.BLACK);
-            weekdayPanel.add(dayLabel); 
-        }
+	        datePanel = new JPanel(); 
+	        datePanel.setOpaque(false);
 
-        
-        datePanel = new JPanel(new GridLayout(6, 7));
-        datePanel.setOpaque(false);
-        updateCalendar(); 
+	        
+	        topPanel.add(monthYearLabel, BorderLayout.NORTH);
+	        topPanel.add(navPanel, BorderLayout.CENTER);
+	        add(topPanel, BorderLayout.NORTH);
+	        add(datePanel, BorderLayout.CENTER);
 
-        
-        topPanel.add(monthYearLabel, BorderLayout.NORTH);
-        topPanel.add(navPanel, BorderLayout.CENTER);
-        topPanel.add(weekdayPanel, BorderLayout.SOUTH);
+	        // action listeners
+	        monthCombo.addActionListener(e -> updateCalendar());
+	        yearCombo.addActionListener(e -> updateCalendar());
+	        prevButton.addActionListener(e -> {
+	            int month = monthCombo.getSelectedIndex();
+	            int year = (int) yearCombo.getSelectedItem();
+	            if (month == 0) {
+	                month = 11;
+	                year--;
+	            } else {
+	                month--;
+	            }
+	            monthCombo.setSelectedIndex(month);
+	            yearCombo.setSelectedItem(year);
+	        });
+	        nextButton.addActionListener(e -> {
+	            int month = monthCombo.getSelectedIndex();
+	            int year = (int) yearCombo.getSelectedItem(); 
+	            if (month == 11) {
+	                month = 0;
+	                year++;
+	            } else { 
+	                month++;
+	            }
+	            monthCombo.setSelectedIndex(month);
+	            yearCombo.setSelectedItem(year);
+	        });
 
-        add(topPanel, BorderLayout.NORTH);
-        add(datePanel, BorderLayout.CENTER);
+	        // Set current month & year
+	        Calendar now = Calendar.getInstance();
+	        monthCombo.setSelectedIndex(now.get(Calendar.MONTH)); 
+	        yearCombo.setSelectedItem(now.get(Calendar.YEAR)); 
+	        updateCalendar(); 
+	        setVisible(true); 
+	    }
 
-        setVisible(true);
-    }
+	    private void updateCalendar() {
+	        datePanel.removeAll();
+	        datePanel.setLayout(new GridLayout(7, 7)); 
 
-    private void updateCalendar() {
-        datePanel.removeAll();
+	        int month = monthCombo.getSelectedIndex();
+	        int year = (int) yearCombo.getSelectedItem();
 
-        int month = monthCombo.getSelectedIndex();
-        int year = (int) yearCombo.getSelectedItem();
+	        monthYearLabel.setText(monthCombo.getSelectedItem() + " " + year);
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month, 1);
+	        Calendar cal = Calendar.getInstance();
+	        cal.set(Calendar.YEAR, year);
+	        cal.set(Calendar.MONTH, month);
+	        cal.set(Calendar.DAY_OF_MONTH, 1);
 
-        int startDay = cal.get(Calendar.DAY_OF_WEEK) - 1;
-        int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+	        int startDay = cal.get(Calendar.DAY_OF_WEEK); 
+	        int daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
 
-        for (int i = 0; i < startDay; i++) {
-            datePanel.add(new JLabel(""));
-        }
+	        
+	        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+	        for (String day : days) {
+	            JLabel dayLabel = new JLabel(day, JLabel.CENTER);
+	            dayLabel.setFont(new Font("Arial", Font.BOLD, 14));  
+	            dayLabel.setForeground(Color.BLACK);
+	            datePanel.add(dayLabel);
+	        }
 
-        for (int day = 1; day <= daysInMonth; day++) {
-            JLabel dateLabel = new JLabel(String.valueOf(day), JLabel.CENTER);
-            dateLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-            dateLabel.setForeground(Color.BLACK);
-            datePanel.add(dateLabel);
-        }
+	        
+	        int blanks = startDay - 1; 
+	        for (int i = 0; i < blanks; i++) {
+	            datePanel.add(new JLabel(""));  
+	        }
 
-        datePanel.revalidate();
-        datePanel.repaint();
-    }
+
+	        for (int day = 1; day <= daysInMonth; day++) {
+	            JPanel dayBox = new JPanel(new BorderLayout());
+	            dayBox.setBackground(new Color(255, 255, 255, 180));
+	            dayBox.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+	            JLabel dayLabel = new JLabel(String.valueOf(day), JLabel.CENTER);
+	            dayLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	            dayBox.add(dayLabel, BorderLayout.CENTER);
+
+	            datePanel.add(dayBox);
+	        }
 
 	
-	
-	    public static void main(String[] args) {
+	        int totalCells = 7 * 7;
+	        int currentCells = blanks + daysInMonth + 7; 
+	        for (int i = currentCells; i < totalCells; i++) {
+	            datePanel.add(new JLabel(""));
+	        }
+
+	        datePanel.revalidate();
+	        datePanel.repaint();
+	    }
+public static void main(String[] args) {
 	    	 new CalendarStep1();
 	    }
 	}
-	
-	    
-	    
-	
 	        
 
 	
